@@ -23,6 +23,7 @@ backup; run a manual backup before any large content change to bring this to zer
 | The root layout itself fails | Self-contained fallback page (no CSS/fonts needed) with phone, email and **Try again**. | `app/global-error.tsx` |
 | Unknown URL or deleted event/service | Branded 404 linking to Events and Home. | `app/not-found.tsx` |
 | Email (Resend) fails — bad key, unverified domain, quota | Visitor is told it failed and shown phone/email to contact directly. Logged as `[contact] failed to send enquiry email`. | `app/contact/actions.ts` |
+| Cinema Portal (events.starkwood.au) down or empty | Movie section shows the built-in national schedule. Logged as `[cinema-portal] … using built-in schedule`; `/api/health` shows `cinemaPortal: "error"` but stays 200. | `lib/cinema-portal.ts` |
 | Sanity webhook fails | Returns 500 with a generic message (no internal detail leaked); logged as `[revalidate] webhook failed`. Content still refreshes within 1 h via time-based revalidation. | `app/api/revalidate/route.ts` |
 
 ## Monitoring
@@ -37,7 +38,7 @@ backup; run a manual backup before any large content change to bring this to zer
 - `env` shows which required variables are set (true/false only — values are never exposed).
 - Point an uptime monitor (Vercel Checks, UptimeRobot, Better Stack — free tiers are fine) at
   `https://starkwood.au/api/health`, every 5 minutes, alerting on non-200.
-- Search Vercel → Project → **Logs** for `[sanity]`, `[contact]`, `[revalidate]`, `[health]`, `[app]`.
+- Search Vercel → Project → **Logs** for `[sanity]`, `[contact]`, `[revalidate]`, `[health]`, `[app]`, `[cinema-portal]`.
 
 ## Backups
 

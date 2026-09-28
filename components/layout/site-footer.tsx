@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { CINEMA_PORTAL_URL } from "@/lib/cinema-portal";
 
 interface SiteFooterProps {
   phone: string;
@@ -131,6 +132,7 @@ export function SiteFooter({
         <div className="flex gap-4 opacity-80">
           <a href="https://fm.starkwood.au" className="hover:text-accent">Starkwood FM</a>
           <a href="https://staff.starkwood.au" className="hover:text-accent">Staff</a>
+          <a href={`${CINEMA_PORTAL_URL}/login`} className="hover:text-accent">Cinema Portal</a>
         </div>
       </div>
     </footer>

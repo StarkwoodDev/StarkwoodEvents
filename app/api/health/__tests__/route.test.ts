@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const { fetchMock } = vi.hoisted(() => ({ fetchMock: vi.fn() }));
 
@@ -12,6 +12,11 @@ describe("GET /api/health", () => {
   beforeEach(() => {
     fetchMock.mockReset();
     vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}")));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("returns 200 ok when Sanity responds", async () => {
@@ -39,5 +44,15 @@ describe("GET /api/health", () => {
     const text = await res.text();
     expect(text).not.toContain("re_secret_value");
     expect(JSON.parse(text).checks.env.RESEND_API_KEY).toBe(true);
+  });
+
+  it("reports the Cinema Portal as down without marking the site degraded", async () => {
+    fetchMock.mockResolvedValue(1);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("ECONNREFUSED")));
+    const res = await GET();
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.status).toBe("ok");
+    expect(body.checks.cinemaPortal).toBe("error");
   });
 });

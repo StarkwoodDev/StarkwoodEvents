@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, Film, MapPin, Ticket } from "lucide-react";
+import type { NationalScreening } from "@/lib/cinema-portal";
 
 const SCREENINGS = [
   { venue: "Knox", city: "Melbourne", time: "6:00 PM", soldOut: true },
@@ -11,7 +12,8 @@ const SCREENINGS = [
   { venue: "South Morang", city: "Melbourne", time: "6:00 PM", soldOut: false },
 ];
 
-const NATIONAL_SCREENINGS = [
+// Fallback used when the Cinema Portal feed is unavailable (see lib/cinema-portal.ts).
+const NATIONAL_SCREENINGS: NationalScreening[] = [
   { date: "27th Sept", cinema: "Blacktown", details: "Blacktown | Cinema 6 (125 seats)" },
   { date: "27th Sept", cinema: "Carousel Perth", details: "Carousel | Cinema 15 (134 seats)" },
   { date: "4th Oct", cinema: "Belconnen Canberra", details: "Belconnen | Cinema 1 (77 seats)" },
@@ -24,7 +26,13 @@ const NATIONAL_SCREENINGS = [
   { date: "18th Oct", cinema: "Regal (Adelaide)", details: "", starred: true },
 ];
 
-export function MovieSpotlight() {
+export function MovieSpotlight({
+  nationalScreenings,
+}: {
+  /** Live schedule from the Cinema Portal; null/undefined falls back to the built-in list. */
+  nationalScreenings?: NationalScreening[] | null;
+}) {
+  const national = nationalScreenings?.length ? nationalScreenings : NATIONAL_SCREENINGS;
   const [showTheatres, setShowTheatres] = useState(false);
 
   return (
@@ -125,7 +133,7 @@ export function MovieSpotlight() {
                       </tr>
                     </thead>
                     <tbody>
-                      {NATIONAL_SCREENINGS.map((s, i) => (
+                      {national.map((s, i) => (
                         <tr
                           key={`${s.date}-${s.cinema}-${i}`}
                           className="border-b border-white/[0.06] last:border-0 odd:bg-white/[0.02]"
@@ -134,6 +142,11 @@ export function MovieSpotlight() {
                           <td className="px-4 py-3 font-medium text-foreground">
                             {s.starred && <span className="mr-1 text-accent-2">★</span>}
                             {s.cinema}
+                            {s.soldOut && (
+                              <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground/60">
+                                Sold out
+                              </span>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-foreground/70">
                             {s.details || "Details to be confirmed"}

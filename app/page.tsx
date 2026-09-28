@@ -17,14 +17,16 @@ import {
 import type { EventSummary, Service, SiteSettings } from "@/lib/types";
 import { DEFAULT_PHONE, DEFAULT_EMAIL } from "@/lib/site-config";
 import { mergeStaticEvents } from "@/lib/static-events";
+import { fetchNationalScreenings } from "@/lib/cinema-portal";
 
 export default async function HomePage() {
-  const [upcomingCms, past, allEventsCms, services, settings] = await Promise.all([
+  const [upcomingCms, past, allEventsCms, services, settings, nationalScreenings] = await Promise.all([
     safeFetch<EventSummary[]>(upcomingEventsQuery, "event", []),
     safeFetch<EventSummary[]>(pastEventsQuery, "event", []),
     safeFetch<(EventSummary & { category?: string })[]>(allEventsQuery, "event", []),
     safeFetch<Service[]>(servicesQuery, "service", []),
     safeFetch<SiteSettings | null>(siteSettingsQuery, "siteSettings", null),
+    fetchNationalScreenings(),
   ]);
 
   // Not-yet-published-in-Sanity events, merged in so they show immediately —
@@ -53,7 +55,7 @@ export default async function HomePage() {
       <div className="relative mt-8 sm:mt-10">
         <UpcomingEventsSection events={upcoming} />
       </div>
-      <MovieSpotlight />
+      <MovieSpotlight nationalScreenings={nationalScreenings} />
       <ServicesTeaser services={services} />
       <RunSheet events={allEvents} />
       <Stats />
