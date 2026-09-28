@@ -41,7 +41,10 @@ export async function safeFetch<T>(
 ): Promise<T> {
   try {
     return await sanityFetch<T>({ query, params, tags: [tag] });
-  } catch {
+  } catch (err) {
+    // Logged so a CMS outage shows up in Vercel runtime/build logs instead of
+    // silently rendering fallback content.
+    console.error(`[sanity] fetch for "${tag}" failed, serving fallback`, err);
     return fallback;
   }
 }

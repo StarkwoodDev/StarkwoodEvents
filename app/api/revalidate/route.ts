@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     revalidateTag(body._type, { expire: 0 });
     return NextResponse.json({ revalidated: true, type: body._type, now: Date.now() });
   } catch (err) {
-    return NextResponse.json({ message: (err as Error).message }, { status: 500 });
+    console.error("[revalidate] webhook failed", err);
+    return NextResponse.json({ message: "Revalidation failed" }, { status: 500 });
   }
 }

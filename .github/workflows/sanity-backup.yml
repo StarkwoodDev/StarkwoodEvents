@@ -1,0 +1,39 @@
+name: Sanity backup
+
+# Weekly off-site copy of CMS content (documents + images), kept as a
+# workflow artifact for 90 days. Git already holds the code; this covers the
+# only data that lives outside the repo. See docs/DISASTER_RECOVERY.md.
+on:
+  schedule:
+    - cron: "0 16 * * 0" # Sundays 16:00 UTC (Mon 02:00/03:00 Melbourne)
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: production
+    steps:
+      - name: Skip when secrets are not configured
+        if: env.SANITY_AUTH_TOKEN == '' || env.NEXT_PUBLIC_SANITY_PROJECT_ID == ''
+        run: echo "::warning::SANITY_AUTH_TOKEN / NEXT_PUBLIC_SANITY_PROJECT_ID secrets not set — backup skipped."
+      - uses: actions/checkout@v4
+        if: env.SANITY_AUTH_TOKEN != '' && env.NEXT_PUBLIC_SANITY_PROJECT_ID != ''
+      - uses: actions/setup-node@v4
+        if: env.SANITY_AUTH_TOKEN != '' && env.NEXT_PUBLIC_SANITY_PROJECT_ID != ''
+        with:
+          node-version: 24
+          cache: npm
+      - if: env.SANITY_AUTH_TOKEN != '' && env.NEXT_PUBLIC_SANITY_PROJECT_ID != ''
+        run: npm ci
+      - if: env.SANITY_AUTH_TOKEN != '' && env.NEXT_PUBLIC_SANITY_PROJECT_ID != ''
+        run: npm run backup:sanity
+      - uses: actions/upload-artifact@v4
+        if: env.SANITY_AUTH_TOKEN != '' && env.NEXT_PUBLIC_SANITY_PROJECT_ID != ''
+        with:
+          name: sanity-backup-${{ github.run_id }}
+          path: backups/*.tar.gz
+          retention-days: 90
+          if-no-files-found: error

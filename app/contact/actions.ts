@@ -27,7 +27,7 @@ export async function sendContactMessage(
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       // CONTACT_FROM_EMAIL must be a verified sender domain in Resend (e.g.
       // website@starkwood.au). The onboarding@resend.dev sandbox fallback can
       // only deliver to the Resend account owner's own verified address, so
@@ -38,8 +38,12 @@ export async function sendContactMessage(
       subject: `New enquiry from ${input.name}`,
       text: input.message,
     });
+    // Resend resolves with { error } for API failures (bad key, unverified
+    // sender, quota) instead of rejecting, so treat that as a failure too.
+    if (error) throw new Error(`Resend ${error.name}: ${error.message}`);
     return { status: "success", errors: {} };
-  } catch {
+  } catch (err) {
+    console.error("[contact] failed to send enquiry email", err);
     return {
       status: "error",
       errors: {},

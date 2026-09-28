@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const OLD_HOST = "events.starkwood.au";
 const NEW_HOST = "starkwood.au";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = request.headers.get("host");
 
   if (host === OLD_HOST) {

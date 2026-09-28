@@ -46,3 +46,6 @@ next-env.d.ts
 
 # large local-only archives
 Imgs/OneDrive_2026-09-02.zip
+
+# Sanity dataset exports (scripts/backup-sanity.sh)
+/backups/
