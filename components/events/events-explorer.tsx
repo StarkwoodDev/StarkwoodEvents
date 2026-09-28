@@ -63,8 +63,8 @@ export function EventsExplorer({
           <EmptyState message="No events in this category yet" />
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
-            {filtered.map((e) => (
-              <EventCard key={e._id} {...e} />
+            {filtered.map((e, i) => (
+              <EventCard key={e._id} {...e} eager={i < 3} />
             ))}
           </div>
         )}

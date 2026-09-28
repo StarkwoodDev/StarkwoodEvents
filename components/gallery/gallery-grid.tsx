@@ -15,7 +15,7 @@ export function GalleryGrid({ groups }: { groups: GalleryGroup[] }) {
 
   return (
     <div className="space-y-12">
-      {groups.map((group) => (
+      {groups.map((group, g) => (
         <section key={group.slug}>
           <Link
             href={`/events/${group.slug}`}
@@ -31,6 +31,7 @@ export function GalleryGrid({ groups }: { groups: GalleryGroup[] }) {
                   alt={`${group.title} photo ${i + 1}`}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
+                  loading={g === 0 && i < 4 ? "eager" : "lazy"}
                   className="object-cover"
                 />
               </div>

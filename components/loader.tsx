@@ -11,7 +11,7 @@ export function Loader({ className = "" }: { className?: string }) {
           width={40}
           height={40}
           className="rounded-full object-cover"
-          priority
+          loading="eager"
         />
       </div>
     </div>

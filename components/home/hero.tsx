@@ -12,7 +12,8 @@ export function Hero({ headline, subheadline }: { headline: string; subheadline:
           src="/hero-bg-gala.jpg"
           alt="An elegant Starkwood Events gala dinner under string lights, with a live band on stage"
           fill
-          priority
+          loading="eager"
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background from-10% via-background/90 via-45% to-background/55" />

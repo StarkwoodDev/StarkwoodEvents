@@ -18,7 +18,13 @@ function ServiceBackground({ slug }: { slug: string }) {
   if (!src) return null;
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit]">
-      <Image src={src} alt="" fill className="object-cover opacity-20" />
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="object-cover opacity-20"
+      />
     </div>
   );
 }

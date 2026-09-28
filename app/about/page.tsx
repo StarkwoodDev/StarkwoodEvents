@@ -24,7 +24,8 @@ export default function AboutPage() {
           src="/team.jpg"
           alt="The Starkwood Events team"
           fill
-          sizes="100vw"
+          sizes="(min-width: 896px) 848px, calc(100vw - 48px)"
+          loading="eager"
           className="object-cover"
         />
       </div>

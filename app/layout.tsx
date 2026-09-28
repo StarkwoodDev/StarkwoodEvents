@@ -53,8 +53,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${syne.variable} ${plusJakartaSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      // Browser extensions (password managers, ad/tracker blockers) inject
+      // attributes into <html>/<body> before React hydrates; don't treat those
+      // as app errors.
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <SiteHeader phone={phone} />
         {children}
         <SiteFooter

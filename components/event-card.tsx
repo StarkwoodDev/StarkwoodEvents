@@ -13,6 +13,8 @@ interface EventCardProps {
   summary?: string;
   coverImageUrl?: string;
   coverImage?: SanityImageSource;
+  /** Load the cover immediately — set for cards in the first, above-the-fold row. */
+  eager?: boolean;
 }
 
 export function EventCard({
@@ -24,6 +26,7 @@ export function EventCard({
   summary,
   coverImageUrl,
   coverImage,
+  eager = false,
 }: EventCardProps) {
   // Prefer the raw Sanity image object so we can request a capped, optimized
   // width via the image CDN instead of shipping the full-size original.
@@ -43,6 +46,7 @@ export function EventCard({
             alt={title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading={eager ? "eager" : "lazy"}
             className="object-cover transition group-hover:scale-105"
           />
         ) : (

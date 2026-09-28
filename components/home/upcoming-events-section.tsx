@@ -30,11 +30,11 @@ const EVENT_OVERRIDES: Record<
   },
 };
 
-function CountdownTile({ value, label }: { value: number; label: string }) {
+function CountdownTile({ value, label }: { value: number | undefined; label: string }) {
   return (
     <div className="flex h-[107px] w-full flex-col items-center justify-center rounded-2xl border border-white/15 bg-white/10">
       <span className="font-mono text-4xl font-bold text-foreground">
-        {String(value).padStart(2, "0")}
+        {value === undefined ? "--" : String(value).padStart(2, "0")}
       </span>
       <span className="mt-1 text-[11px] font-extrabold tracking-[0.15em] text-foreground/45">
         {label}
@@ -45,13 +45,16 @@ function CountdownTile({ value, label }: { value: number; label: string }) {
 
 export function UpcomingEventsSection({ events }: { events: EventSummary[] }) {
   const event = events[0];
-  const [countdown, setCountdown] = useState(() =>
-    event?.startDate ? getCountdown(event.startDate) : null,
-  );
+  // Starts null and is only computed in the browser: computing it during render
+  // would give the server and the client different seconds (hydration mismatch).
+  const [countdown, setCountdown] = useState<ReturnType<typeof getCountdown> | null>(null);
 
   useEffect(() => {
-    if (!event?.startDate) return;
-    const id = setInterval(() => setCountdown(getCountdown(event.startDate!)), 1000);
+    const startDate = event?.startDate;
+    if (!startDate) return;
+    const tick = () => setCountdown(getCountdown(startDate));
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [event?.startDate]);
 
@@ -75,7 +78,8 @@ export function UpcomingEventsSection({ events }: { events: EventSummary[] }) {
             src="/images/next-up/sidney-myer-music-bowl.jpg"
             alt="Aerial view of the Sidney Myer Music Bowl, the venue for Naadha Gama"
             fill
-            priority
+            loading="eager"
+            sizes="(min-width: 1152px) 1152px, 100vw"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/35" />
@@ -143,14 +147,14 @@ export function UpcomingEventsSection({ events }: { events: EventSummary[] }) {
             </div>
           </div>
 
-          {countdown && (
+          {event.startDate && (
             <div className="rounded-2xl border-t border-white/10 bg-background/40 p-6 backdrop-blur-sm lg:border-l lg:border-t-0 lg:pl-10">
               <p className="text-xs font-extrabold tracking-[0.2em] text-foreground/45">Doors open in</p>
               <div className="mt-4 grid grid-cols-4 gap-3">
-                <CountdownTile value={countdown.days} label="Days" />
-                <CountdownTile value={countdown.hours} label="Hours" />
-                <CountdownTile value={countdown.minutes} label="Mins" />
-                <CountdownTile value={countdown.seconds} label="Secs" />
+                <CountdownTile value={countdown?.days} label="Days" />
+                <CountdownTile value={countdown?.hours} label="Hours" />
+                <CountdownTile value={countdown?.minutes} label="Mins" />
+                <CountdownTile value={countdown?.seconds} label="Secs" />
               </div>
               <p className="mt-4 text-sm font-extrabold text-foreground/50">
                 Counting down to {formatEventDate(event.startDate)}.
